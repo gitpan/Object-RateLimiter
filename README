@@ -35,8 +35,9 @@ SYNOPSIS
 
 DESCRIPTION
     This is a generic rate-limiter object, implementing the math described
-    in <http://www.perl.com/pub/2004/11/11/floodcontrol.html> in lightweight
-    objects.
+    in <http://www.perl.com/pub/2004/11/11/floodcontrol.html>.
+
+    Fractional seconds are supported.
 
   new
       my $ctrl = Object::RateLimiter->new(
@@ -60,6 +61,8 @@ DESCRIPTION
 
     Clears the event history.
 
+    Always returns true.
+
   delay
       if (my $delay = $ctrl->delay) {
         sleep $delay;  # ... or do something else
@@ -71,9 +74,9 @@ DESCRIPTION
     The "delay()" method determines if some work can be done now, or should
     wait.
 
-    When called, a new event timestamp is recorded; if we've exceeded our
-    limit, the current delay (in possibly-fractional seconds) until the
-    event is allowed is returned.
+    When called, event timestamps are considered; if we have exceeded our
+    limit, the delay in (possibly fractional) seconds until the event would
+    be allowed is returned.
 
     A return value of 0 indicates that the event does not need to wait.
 
@@ -85,6 +88,8 @@ DESCRIPTION
 
     Clears the event history if the last seen event is outside of our time
     window.
+
+    Returns true if "clear" was called.
 
     (You're not required to call "expire()", but it can be useful to force a
     cleanup.)

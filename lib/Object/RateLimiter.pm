@@ -1,13 +1,13 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '0.001001';
+  $Object::RateLimiter::VERSION = '0.001002';
 }
 use strictures 1;
 use Carp;
 
 use Time::HiRes ();
 
-use List::Objects::WithUtils 'array';
+use Lowu 'array';
 
 sub EVENTS () { 0 }
 sub SECS   () { 1 }
@@ -40,6 +40,7 @@ sub clone {
 
   $params{events} = $self->events
     unless defined $params{events};
+
   $params{seconds} = $self->seconds
     unless defined $params{seconds};
 
@@ -66,6 +67,7 @@ sub delay {
         - Time::HiRes::time();
 
     return $delayed if $delayed > 0;
+
     $thisq->shift
   }
 
@@ -141,8 +143,9 @@ Object::RateLimiter - A flood control (rate limiter) object
 =head1 DESCRIPTION
 
 This is a generic rate-limiter object, implementing the math described in
-L<http://www.perl.com/pub/2004/11/11/floodcontrol.html> in lightweight
-objects.
+L<http://www.perl.com/pub/2004/11/11/floodcontrol.html>.
+
+Fractional seconds are supported.
 
 =head2 new
 
@@ -169,6 +172,8 @@ left untouched.
 
 Clears the event history.
 
+Always returns true.
+
 =head2 delay
 
   if (my $delay = $ctrl->delay) {
@@ -180,9 +185,9 @@ Clears the event history.
 
 The C<delay()> method determines if some work can be done now, or should wait.
 
-When called, a new event timestamp is recorded; if we've exceeded our limit,
-the current delay (in possibly-fractional seconds) until the event is allowed
-is returned.
+When called, event timestamps are considered; if we have exceeded our limit,
+the delay in (possibly fractional) seconds until the event would be
+allowed is returned.
 
 A return value of 0 indicates that the event does not need to wait.
 
@@ -195,6 +200,8 @@ Returns the B<events> limit the object was constructed with.
   $ctrl->expire;
 
 Clears the event history if the last seen event is outside of our time window.
+
+Returns true if L</clear> was called.
 
 (You're not required to call C<expire()>, but it can be useful to force a
 cleanup.)
