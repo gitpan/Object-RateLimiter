@@ -1,0 +1,111 @@
+# NAME
+
+Object::RateLimiter - A flood control (rate limiter) object
+
+# SYNOPSIS
+
+    use Object::RateLimiter;
+
+    my $ctrl = Object::RateLimiter->new(
+      events  => 3,
+      seconds => 5
+    );
+
+    # Run some subs, as a contrived example;
+    # no more than 3 in 5 seconds, per our constructor above:
+    my @work = (
+      sub { "foo" },
+      sub { "bar" },
+      # ...
+    );
+
+    while (my $some_item = shift @work) {
+      if (my $delay = $ctrl->delay) {
+        # Delayed $delay seconds.
+        sleep $delay;
+      } else {
+        # No delay.
+        $some_item->()
+      }
+    }
+
+    # Clear the event history if it's stale:
+    $ctrl->expire;
+
+    # Clear the event history unconditionally:
+    $ctrl->clear;
+
+# DESCRIPTION
+
+This is a generic rate-limiter object, implementing the math described in
+[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html) in lightweight
+objects.
+
+## new
+
+    my $ctrl = Object::RateLimiter->new(
+      events  => 3,
+      seconds => 5
+    );
+
+Constructs a new rate-limiter with a clean event history.
+
+## clone
+
+    my $new_ctrl = $ctrl->clone( events => 4 );
+
+Clones an existing rate-limiter; new options can be provided, overriding
+previous settings. 
+
+The new limiter contains a clone of the event history; the old rate-limiter is
+left untouched.
+
+## clear
+
+    $ctrl->clear;
+
+Clears the event history.
+
+## delay
+
+    if (my $delay = $ctrl->delay) {
+      sleep $delay;  # ... or do something else
+    } else {
+      # Not delayed.
+      do_work;
+    }
+
+The `delay()` method determines if some work can be done now, or should wait.
+
+When called, a new event timestamp is recorded; if we've exceeded our limit,
+the current delay (in possibly-fractional seconds) until the event is allowed
+is returned.
+
+A return value of 0 indicates that the event does not need to wait.
+
+## events
+
+Returns the __events__ limit the object was constructed with.
+
+## expire
+
+    $ctrl->expire;
+
+Clears the event history if the last seen event is outside of our time window.
+
+(You're not required to call `expire()`, but it can be useful to force a
+cleanup.)
+
+## seconds
+
+Returns the __seconds__ limit the object was constructed with.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Based on the math from [Algorithm::FloodControl](http://search.cpan.org/perldoc?Algorithm::FloodControl) as described in an article
+written by the author:
+[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html)
+
+Licensed under the same terms as Perl.
