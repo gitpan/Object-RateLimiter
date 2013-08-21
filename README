@@ -39,7 +39,7 @@ DESCRIPTION
 
     The algorithm is fairly simple; the article linked above contains an
     in-depth discussion by Vladi Belperchinov-Shabanski (CPAN:
-    <http://www.metacpan.org/author/CADE/"CADE">):
+    <http://www.metacpan.org/author/CADE>):
 
       $delay =
         ( 

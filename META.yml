@@ -22,4 +22,4 @@ requires:
   strictures: 1
 resources:
   repository: git://github.com/avenj/object-ratelimiter.git
-version: 0.001003
+version: 0.001004

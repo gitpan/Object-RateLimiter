@@ -42,7 +42,7 @@ This is a generic rate-limiter object, implementing the math described in
 
 The algorithm is fairly simple; the article linked above contains an in-depth
 discussion by Vladi Belperchinov-Shabanski (CPAN:
-[http://www.metacpan.org/author/CADE/"CADE"](http://www.metacpan.org/author/CADE/"CADE")):
+[http://www.metacpan.org/author/CADE](http://www.metacpan.org/author/CADE)):
 
     $delay =
       ( 

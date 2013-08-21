@@ -1,6 +1,6 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '0.001003';
+  $Object::RateLimiter::VERSION = '0.001004';
 }
 use strictures 1;
 use Carp;
@@ -90,7 +90,7 @@ sub expire {
   my $events = $self->_queue || return;
   return unless $events->count;
 
-  my $latest_ts = $events->get(-1);
+  my $latest_ts = $events->tail;
   return unless defined $latest_ts;
 
   if ( Time::HiRes::time() - $latest_ts > $self->seconds) {
@@ -150,7 +150,7 @@ L<http://www.perl.com/pub/2004/11/11/floodcontrol.html>.
 
 The algorithm is fairly simple; the article linked above contains an in-depth
 discussion by Vladi Belperchinov-Shabanski (CPAN:
-L<http://www.metacpan.org/author/CADE/"CADE">):
+L<http://www.metacpan.org/author/CADE>):
 
   $delay =
     ( 
