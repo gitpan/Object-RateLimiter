@@ -16,10 +16,11 @@ name: Object-RateLimiter
 requires:
   Carp: 0
   List::Objects::WithUtils: 1.009
+  Scalar::Util: 0
   Time::HiRes: 0
   namespace::clean: 0
   perl: v5.8.9
   strictures: 1
 resources:
   repository: git://github.com/avenj/object-ratelimiter.git
-version: 0.001004
+version: 0.002000

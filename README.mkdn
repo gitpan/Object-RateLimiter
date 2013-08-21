@@ -21,7 +21,8 @@ Object::RateLimiter - A flood control (rate limiter) object
 
     while (my $some_item = shift @work) {
       if (my $delay = $ctrl->delay) {
-        # Delayed $delay seconds.
+        # Delayed $delay (fractional) seconds.
+        # (You might want Time::HiRes::usleep, or yield to event loop, etc)
         sleep $delay;
       } else {
         # No delay.
@@ -38,7 +39,8 @@ Object::RateLimiter - A flood control (rate limiter) object
 # DESCRIPTION
 
 This is a generic rate-limiter object, implementing the math described in
-[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html).
+[http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html) via light-weight
+array-type objects.
 
 The algorithm is fairly simple; the article linked above contains an in-depth
 discussion by Vladi Belperchinov-Shabanski (CPAN:
@@ -62,6 +64,12 @@ This module uses [Time::HiRes](http://search.cpan.org/perldoc?Time::HiRes) to pr
 
 Constructs a new rate-limiter with a clean event history.
 
+## clear
+
+    $ctrl->clear;
+
+Clears the event history. Always returns true.
+
 ## clone
 
     my $new_ctrl = $ctrl->clone( events => 4 );
@@ -71,14 +79,6 @@ previous settings.
 
 The new limiter contains a clone of the event history; the old rate-limiter is
 left untouched.
-
-## clear
-
-    $ctrl->clear;
-
-Clears the event history.
-
-Always returns true.
 
 ## delay
 
@@ -105,12 +105,19 @@ Returns the __events__ limit the object was constructed with.
 
     $ctrl->expire;
 
-Clears the event history if the last seen event is outside of our time window.
+Clears the event history if ["is\_expired"](#is\_expired) is true.
 
 Returns true if ["clear"](#clear) was called.
 
-(You're not required to call `expire()`, but it can be useful to force a
-cleanup.)
+You're not required to call `expire()`, but it can be useful to save a little
+memory (a 10 event history uses about 1kb here).
+
+## is\_expired
+
+Returns true if the last seen event is outside of our time window (in other
+words, the event history is stale) or there is no event history.
+
+Also see ["expire"](#expire)
 
 ## seconds
 

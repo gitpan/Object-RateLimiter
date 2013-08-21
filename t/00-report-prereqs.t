@@ -13,6 +13,7 @@ my @modules = qw(
   Carp
   ExtUtils::MakeMaker
   List::Objects::WithUtils
+  Scalar::Util
   Test::More
   Time::HiRes
   namespace::clean

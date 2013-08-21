@@ -6,6 +6,11 @@ BEGIN { use_ok( 'Object::RateLimiter' ) }
 # new()
 eval {; Object::RateLimiter->new };
 cmp_ok $@, '=~', qr/parameters/, 'new() without args dies ok';
+eval {; Object::RateLimiter->new(events => 3) };
+cmp_ok $@, '=~', qr/parameters/, 'new() without seconds param dies ok';
+eval {; Object::RateLimiter->new(seconds => 3) };
+cmp_ok $@, '=~', qr/parameters/, 'new() without events param dies ok';
+
 my $ctrl = new_ok 'Object::RateLimiter' => [
   events  => 3,
   seconds => 900,
@@ -22,7 +27,13 @@ cmp_ok $ctrl->events,  '==', 3,   'events() ok';
 cmp_ok $ctrl->delay, '==', 0, 'delay 1 == 0 ok';
 cmp_ok $ctrl->delay, '==', 0, 'delay 2 == 0 ok';
 cmp_ok $ctrl->delay, '==', 0, 'delay 3 == 0 ok';
-cmp_ok $ctrl->delay, '>',  0, 'delay 4 > 0 ok';
+
+my $delay = $ctrl->delay;
+cmp_ok $delay, '>',  0, 'delay 4 > 0 ok';
+cmp_ok $delay, '<=', 900, 'delay 4 <= 900 ok';
+my $delay2 = $ctrl->delay;
+cmp_ok $delay2, '>',  0, 'delay 5 > 0 ok';
+cmp_ok $delay2, '<=', $delay, 'delay 5 <= delay 4 ok';
 
 # clone() 
 my $clone = $ctrl->clone( events => 10 );
@@ -30,11 +41,13 @@ cmp_ok $clone->delay,   '==', 0,   'cloned with new events param ok';
 cmp_ok $clone->seconds, '==', 900, 'cloned kept seconds() ok';
 
 # clone() + expire()
+ok !$ctrl->is_expired, 'is_expired() returned false value';
 ok !$ctrl->expire, 'expire() returned false value';
 ok $ctrl->_queue,  'expire() left queue alone';
 diag "This test will sleep for one second";
 my $expire = $ctrl->clone( seconds => 0.5 );
 sleep 1;
+ok $expire->is_expired, 'is_expired() returned true value';
 ok $expire->expire,  'expire() returned true value';
 ok !$expire->_queue, 'expire() cleared queue';
 

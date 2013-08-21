@@ -1,13 +1,14 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '0.001004';
+  $Object::RateLimiter::VERSION = '0.002000';
 }
 use strictures 1;
-use Carp;
+use Carp 'confess';
 
-use Time::HiRes ();
+use List::Objects::WithUtils 'array';
 
-use Lowu 'array';
+use Scalar::Util 'blessed';
+use Time::HiRes  'time';
 
 sub EVENTS () { 0 }
 sub SECS   () { 1 }
@@ -21,21 +22,19 @@ sub _queue   { $_[0]->[QUEUE]  }
 
 sub new {
   my ($class, %params) = @_;
-  if (my $rtype = ref $class) {
-    $class = $rtype
+  if (my $type = blessed $class) {
+    $class = $type
   }
 
-  unless (defined $params{seconds} && defined $params{events}) {
-    confess "Constructor requires 'seconds =>' and 'events =>' parameters"
-  }
+  confess "Constructor requires 'seconds =>' and 'events =>' parameters"
+    unless defined $params{seconds}
+       and defined $params{events};
 
-  my $self = [
+  bless [
     $params{events},   # EVENTS
     $params{seconds},  # SECS
     undef              # QUEUE (lazy-build from ->delay)
-  ];
-
-  bless $self, $class
+  ], $class
 }
 
 sub clone {
@@ -47,7 +46,7 @@ sub clone {
   $params{seconds} = $self->seconds
     unless defined $params{seconds};
 
-  my $cloned = ref($self)->new(%params);
+  my $cloned = blessed($self)->new(%params);
 
   if (my $currentq = $self->_queue) {
     $cloned->[QUEUE] = array( $currentq->all )
@@ -56,50 +55,45 @@ sub clone {
   $cloned
 }
 
+
 sub delay {
   my ($self) = @_;
   my $thisq  = $self->[QUEUE] ||= array;
   my $ev_limit = $self->events;
 
-  if ((my $events = $thisq->count) >= $ev_limit) {
-    my $oldest_ts = $thisq->head;
+  if ((my $ev_count = $thisq->count) >= $ev_limit) {
+    my $oldest_ts = $thisq->get(0);
 
-    my $delayed =
-      ( $oldest_ts + ( $events * $self->seconds / $ev_limit ) )
-        - Time::HiRes::time();
+    my $delayed = ( 
+      $oldest_ts 
+      + ( $ev_count * $self->seconds / $ev_limit ) 
+    ) - time;
 
-    return $delayed if $delayed > 0;
-
-    # No waiting.
-    $thisq->shift
+    $delayed > 0 ? return $delayed : $thisq->shift
   }
 
-  $thisq->push( Time::HiRes::time );
-  return 0
+  $thisq->push( time );
+
+  0
 }
 
+
 sub clear {
-  my ($self) = @_;
-  $self->[QUEUE] = undef;
+  $_[0]->[QUEUE] = undef;
   1
 }
 
 sub expire {
   my ($self) = @_;
+  $self->is_expired ? $self->clear : ()
+}
 
-  my $events = $self->_queue || return;
-  return unless $events->count;
+sub is_expired {
+  my ($self) = @_;
+  my $thisq  = $self->_queue   || return;
+  my $latest = $thisq->get(-1) || return;
 
-  my $latest_ts = $events->tail;
-  return unless defined $latest_ts;
-
-  if ( Time::HiRes::time() - $latest_ts > $self->seconds) {
-    # More than ->seconds seconds since last event was noted.
-    # We can clear().
-    return $self->clear
-  }
-
-  ()
+  time - $latest > $self->seconds ? 1 : ()
 }
 
 1;
@@ -129,7 +123,8 @@ Object::RateLimiter - A flood control (rate limiter) object
 
   while (my $some_item = shift @work) {
     if (my $delay = $ctrl->delay) {
-      # Delayed $delay seconds.
+      # Delayed $delay (fractional) seconds.
+      # (You might want Time::HiRes::usleep, or yield to event loop, etc)
       sleep $delay;
     } else {
       # No delay.
@@ -146,7 +141,8 @@ Object::RateLimiter - A flood control (rate limiter) object
 =head1 DESCRIPTION
 
 This is a generic rate-limiter object, implementing the math described in
-L<http://www.perl.com/pub/2004/11/11/floodcontrol.html>.
+L<http://www.perl.com/pub/2004/11/11/floodcontrol.html> via light-weight
+array-type objects.
 
 The algorithm is fairly simple; the article linked above contains an in-depth
 discussion by Vladi Belperchinov-Shabanski (CPAN:
@@ -170,6 +166,12 @@ This module uses L<Time::HiRes> to provide support for fractional seconds.
 
 Constructs a new rate-limiter with a clean event history.
 
+=head2 clear
+
+  $ctrl->clear;
+
+Clears the event history. Always returns true.
+
 =head2 clone
 
   my $new_ctrl = $ctrl->clone( events => 4 );
@@ -179,14 +181,6 @@ previous settings.
 
 The new limiter contains a clone of the event history; the old rate-limiter is
 left untouched.
-
-=head2 clear
-
-  $ctrl->clear;
-
-Clears the event history.
-
-Always returns true.
 
 =head2 delay
 
@@ -213,12 +207,19 @@ Returns the B<events> limit the object was constructed with.
 
   $ctrl->expire;
 
-Clears the event history if the last seen event is outside of our time window.
+Clears the event history if L</is_expired> is true.
 
 Returns true if L</clear> was called.
 
-(You're not required to call C<expire()>, but it can be useful to force a
-cleanup.)
+You're not required to call C<expire()>, but it can be useful to save a little
+memory (a 10 event history uses about 1kb here).
+
+=head2 is_expired
+
+Returns true if the last seen event is outside of our time window (in other
+words, the event history is stale) or there is no event history.
+
+Also see L</expire>
 
 =head2 seconds
 

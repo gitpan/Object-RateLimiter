@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "List::Objects::WithUtils" => "1.009",
+    "Scalar::Util" => 0,
     "Time::HiRes" => 0,
     "namespace::clean" => 0,
     "strictures" => 1
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.001004",
+  "VERSION" => "0.002000",
   "test" => {
     "TESTS" => "t/*.t"
   }
