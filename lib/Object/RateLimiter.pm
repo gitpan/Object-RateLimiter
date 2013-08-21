@@ -1,6 +1,6 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '0.001002';
+  $Object::RateLimiter::VERSION = '0.001003';
 }
 use strictures 1;
 use Carp;
@@ -21,6 +21,9 @@ sub _queue   { $_[0]->[QUEUE]  }
 
 sub new {
   my ($class, %params) = @_;
+  if (my $rtype = ref $class) {
+    $class = $rtype
+  }
 
   unless (defined $params{seconds} && defined $params{events}) {
     confess "Constructor requires 'seconds =>' and 'events =>' parameters"
@@ -56,18 +59,18 @@ sub clone {
 sub delay {
   my ($self) = @_;
   my $thisq  = $self->[QUEUE] ||= array;
+  my $ev_limit = $self->events;
 
-  if ((my $pending = $thisq->count) >= $self->events) {
+  if ((my $events = $thisq->count) >= $ev_limit) {
     my $oldest_ts = $thisq->head;
-    my $ev_lim    = $self->events;
-    my $ev_sec    = $self->seconds;
 
     my $delayed =
-      ( $oldest_ts + ( $pending * $ev_sec / $ev_lim ) )
+      ( $oldest_ts + ( $events * $self->seconds / $ev_limit ) )
         - Time::HiRes::time();
 
     return $delayed if $delayed > 0;
 
+    # No waiting.
     $thisq->shift
   }
 
@@ -119,8 +122,8 @@ Object::RateLimiter - A flood control (rate limiter) object
   # Run some subs, as a contrived example;
   # no more than 3 in 5 seconds, per our constructor above:
   my @work = (
-    sub { "foo" },
-    sub { "bar" },
+    sub { "foo" },  sub { "bar" },
+    sub { "baz" },  sub { "cake" },
     # ...
   );
 
@@ -130,7 +133,7 @@ Object::RateLimiter - A flood control (rate limiter) object
       sleep $delay;
     } else {
       # No delay.
-      $some_item->()
+      print $some_item->()
     }
   }
 
@@ -145,7 +148,18 @@ Object::RateLimiter - A flood control (rate limiter) object
 This is a generic rate-limiter object, implementing the math described in
 L<http://www.perl.com/pub/2004/11/11/floodcontrol.html>.
 
-Fractional seconds are supported.
+The algorithm is fairly simple; the article linked above contains an in-depth
+discussion by Vladi Belperchinov-Shabanski (CPAN:
+L<http://www.metacpan.org/author/CADE/"CADE">):
+
+  $delay =
+    ( 
+      $oldest_timestamp + 
+      ( $seen_events * $limit_secs / $event_limit ) 
+    )
+    - time()
+
+This module uses L<Time::HiRes> to provide support for fractional seconds.
 
 =head2 new
 

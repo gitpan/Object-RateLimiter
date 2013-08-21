@@ -1,5 +1,13 @@
 # Changes for Object-RateLimiter
 
+0.001003 2013-08-21
+
+  - Allow $obj->new()
+
+  - POD and test tweaks
+
+  - Add examples/incr.pl
+
 0.001002 2013-08-19
 
   - POD and test fixups

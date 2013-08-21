@@ -14,8 +14,8 @@ Object::RateLimiter - A flood control (rate limiter) object
     # Run some subs, as a contrived example;
     # no more than 3 in 5 seconds, per our constructor above:
     my @work = (
-      sub { "foo" },
-      sub { "bar" },
+      sub { "foo" },  sub { "bar" },
+      sub { "baz" },  sub { "cake" },
       # ...
     );
 
@@ -25,7 +25,7 @@ Object::RateLimiter - A flood control (rate limiter) object
         sleep $delay;
       } else {
         # No delay.
-        $some_item->()
+        print $some_item->()
       }
     }
 
@@ -40,7 +40,18 @@ Object::RateLimiter - A flood control (rate limiter) object
 This is a generic rate-limiter object, implementing the math described in
 [http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html).
 
-Fractional seconds are supported.
+The algorithm is fairly simple; the article linked above contains an in-depth
+discussion by Vladi Belperchinov-Shabanski (CPAN:
+[http://www.metacpan.org/author/CADE/"CADE"](http://www.metacpan.org/author/CADE/"CADE")):
+
+    $delay =
+      ( 
+        $oldest_timestamp + 
+        ( $seen_events * $limit_secs / $event_limit ) 
+      )
+      - time()
+
+This module uses [Time::HiRes](http://search.cpan.org/perldoc?Time::HiRes) to provide support for fractional seconds.
 
 ## new
 
