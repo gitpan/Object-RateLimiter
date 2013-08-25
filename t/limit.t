@@ -44,7 +44,7 @@ cmp_ok $clone->seconds, '==', 900, 'cloned kept seconds() ok';
 ok !$ctrl->is_expired, 'is_expired() returned false value';
 ok !$ctrl->expire, 'expire() returned false value';
 ok $ctrl->_queue,  'expire() left queue alone';
-diag "This test will sleep for one second";
+note "This test will sleep for one second";
 my $expire = $ctrl->clone( seconds => 0.5 );
 sleep 1;
 ok $expire->is_expired, 'is_expired() returned true value';

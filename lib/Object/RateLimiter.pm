@@ -1,6 +1,6 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '0.002000';
+  $Object::RateLimiter::VERSION = '1.000000';
 }
 use strictures 1;
 use Carp 'confess';
@@ -124,7 +124,7 @@ Object::RateLimiter - A flood control (rate limiter) object
   while (my $some_item = shift @work) {
     if (my $delay = $ctrl->delay) {
       # Delayed $delay (fractional) seconds.
-      # (You might want Time::HiRes::usleep, or yield to event loop, etc)
+      # (You might want Time::HiRes::sleep, or yield to event loop, etc)
       sleep $delay;
     } else {
       # No delay.

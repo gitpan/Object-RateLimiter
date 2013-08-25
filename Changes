@@ -1,4 +1,8 @@
-# Changes for Object-RateLimiter
+Revision history for Perl module Object::RateLimiter
+
+1.000000 2013-08-24
+
+  - Minor cleanups; call interface stable-enough
 
 0.002000 2013-08-21
 
