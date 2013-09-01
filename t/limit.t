@@ -55,5 +55,7 @@ ok !$expire->_queue, 'expire() cleared queue';
 ok $ctrl->clear,  'clear() returned true value';
 ok !$ctrl->_queue, 'clear() cleared queue';
 
+# coderef call
+cmp_ok $ctrl->(), '==', 0, 'coderef call ok';
 
 done_testing;

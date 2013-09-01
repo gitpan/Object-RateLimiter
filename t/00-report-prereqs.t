@@ -17,6 +17,7 @@ my @modules = qw(
   Test::More
   Time::HiRes
   namespace::clean
+  overload
   perl
   strictures
 );

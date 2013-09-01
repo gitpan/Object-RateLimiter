@@ -36,6 +36,9 @@ Object::RateLimiter - A flood control (rate limiter) object
     # Clear the event history unconditionally:
     $ctrl->clear;
 
+    # Same as calling ->delay:
+    my $delayed = $ctrl->();
+
 # DESCRIPTION
 
 This is a generic rate-limiter object, implementing the math described in
@@ -88,6 +91,9 @@ left untouched.
       # Not delayed.
       do_work;
     }
+
+    # Same as calling ->delay:
+    my $delay = $ctrl->();
 
 The `delay()` method determines if some work can be done now, or should wait.
 

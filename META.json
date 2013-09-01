@@ -4,7 +4,7 @@
       "Jon Portnoy <avenj@cobaltirc.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,8 @@
             "Scalar::Util" : "0",
             "Time::HiRes" : "0",
             "namespace::clean" : "0",
-            "perl" : "v5.8.9",
+            "overload" : "0",
+            "perl" : "5.006",
             "strictures" : "1"
          }
       },
@@ -52,6 +53,6 @@
          "web" : "git://github.com/avenj/object-ratelimiter"
       }
    },
-   "version" : "1.000000"
+   "version" : "1.001001"
 }
 
