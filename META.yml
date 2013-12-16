@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,13 +15,13 @@ meta-spec:
 name: Object-RateLimiter
 requires:
   Carp: 0
-  List::Objects::WithUtils: 1.009
+  Class::Method::Modifiers: 0
+  List::Objects::WithUtils: 2
+  Object::ArrayType::New: 0.002001
   Scalar::Util: 0
   Time::HiRes: 0
   namespace::clean: 0
   overload: 0
-  perl: 5.006
-  strictures: 1
 resources:
   repository: git://github.com/avenj/object-ratelimiter.git
-version: 1.001001
+version: 1.001002

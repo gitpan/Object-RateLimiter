@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -21,47 +21,41 @@ my %WriteMakefileArgs = (
   "NAME" => "Object::RateLimiter",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "List::Objects::WithUtils" => "1.009",
+    "Class::Method::Modifiers" => 0,
+    "List::Objects::WithUtils" => 2,
+    "Object::ArrayType::New" => "0.002001",
     "Scalar::Util" => 0,
     "Time::HiRes" => 0,
     "namespace::clean" => 0,
-    "overload" => 0,
-    "strictures" => 1
+    "overload" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.001001",
+  "VERSION" => "1.001002",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  my $tr = delete $WriteMakefileArgs{TEST_REQUIRES};
-  my $br = $WriteMakefileArgs{BUILD_REQUIRES};
-  for my $mod ( keys %$tr ) {
-    if ( exists $br->{$mod} ) {
-      $br->{$mod} = $tr->{$mod} if $tr->{$mod} > $br->{$mod};
-    }
-    else {
-      $br->{$mod} = $tr->{$mod};
-    }
-  }
-}
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "Class::Method::Modifiers" => 0,
+  "List::Objects::WithUtils" => 2,
+  "Object::ArrayType::New" => "0.002001",
+  "Scalar::Util" => 0,
+  "Test::More" => "0.88",
+  "Time::HiRes" => 0,
+  "namespace::clean" => 0,
+  "overload" => 0
+);
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
-  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM};
-  for my $mod ( keys %$br ) {
-    if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
-    }
-    else {
-      $pp->{$mod} = $br->{$mod};
-    }
-  }
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
 }
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}

@@ -1,5 +1,9 @@
 Revision history for Perl module Object::RateLimiter
 
+1.001002 2013-12-15
+
+  - Use Object::ArrayType::New
+
 1.001001 2013-09-01
 
   - Add $obj->() call syntax as a shortcut for ->delay()

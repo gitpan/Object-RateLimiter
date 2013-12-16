@@ -13,14 +13,13 @@ cmp_ok $@, '=~', qr/parameters/, 'new() without events param dies ok';
 
 my $ctrl = new_ok 'Object::RateLimiter' => [
   events  => 3,
-  seconds => 900,
+  seconds => 1200,
 ];
 
-isa_ok $ctrl->new(events => 1, seconds => 2), 'Object::RateLimiter',
-  '$obj->new';
+isa_ok $ctrl->new(events => 1, seconds => 2), 'Object::RateLimiter';
 
 # seconds() / events()
-cmp_ok $ctrl->seconds, '==', 900, 'seconds() ok';
+cmp_ok $ctrl->seconds, '==', 1200, 'seconds() ok';
 cmp_ok $ctrl->events,  '==', 3,   'events() ok';
 
 # delay()
@@ -30,7 +29,7 @@ cmp_ok $ctrl->delay, '==', 0, 'delay 3 == 0 ok';
 
 my $delay = $ctrl->delay;
 cmp_ok $delay, '>',  0, 'delay 4 > 0 ok';
-cmp_ok $delay, '<=', 900, 'delay 4 <= 900 ok';
+cmp_ok $delay, '<=', 1200, 'delay 4 <= 1200 ok';
 my $delay2 = $ctrl->delay;
 cmp_ok $delay2, '>',  0, 'delay 5 > 0 ok';
 cmp_ok $delay2, '<=', $delay, 'delay 5 <= delay 4 ok';
@@ -38,7 +37,7 @@ cmp_ok $delay2, '<=', $delay, 'delay 5 <= delay 4 ok';
 # clone() 
 my $clone = $ctrl->clone( events => 10 );
 cmp_ok $clone->delay,   '==', 0,   'cloned with new events param ok';
-cmp_ok $clone->seconds, '==', 900, 'cloned kept seconds() ok';
+cmp_ok $clone->seconds, '==', 1200, 'cloned kept seconds() ok';
 
 # clone() + expire()
 ok !$ctrl->is_expired, 'is_expired() returned false value';

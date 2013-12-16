@@ -55,6 +55,10 @@ DESCRIPTION
 
     This module uses Time::HiRes to provide support for fractional seconds.
 
+    See Algorithm::FloodControl for a similar module with a functional
+    interface & persistent on-disk storage features (for use with CGI
+    applications).
+
   new
       my $ctrl = Object::RateLimiter->new(
         events  => 3,

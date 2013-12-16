@@ -1,20 +1,16 @@
 package Object::RateLimiter;
 {
-  $Object::RateLimiter::VERSION = '1.001001';
+  $Object::RateLimiter::VERSION = '1.001002';
 }
-use strictures 1;
+use strict; use warnings FATAL => 'all';
+
 use Carp 'confess';
-
 use List::Objects::WithUtils 'array';
-
 use Scalar::Util 'blessed';
 use Time::HiRes  'time';
 
-sub EVENTS () { 0 }
-sub SECS   () { 1 }
-sub QUEUE  () { 2 }
-
 use namespace::clean;
+
 use overload
   bool     => sub { 1 },
   '&{}'    => sub {
@@ -23,43 +19,32 @@ use overload
   },
   fallback => 1;
 
-
+use Object::ArrayType::New
+  [ events  => '', seconds => 'SECS', '' => 'QUEUE' ];
 sub seconds  { $_[0]->[SECS]   }
 sub events   { $_[0]->[EVENTS] }
 sub _queue   { $_[0]->[QUEUE]  }
 
-sub new {
-  my ($class, %params) = @_;
-  if (my $type = blessed $class) {
-    $class = $type
-  }
-
+use Class::Method::Modifiers;
+around new => sub {
+  my ($orig, $class) = splice @_, 0, 2;
+  my $self = $class->$orig(@_);
   confess "Constructor requires 'seconds =>' and 'events =>' parameters"
-    unless defined $params{seconds}
-       and defined $params{events};
-
-  bless [
-    $params{events},   # EVENTS
-    $params{seconds},  # SECS
-    undef              # QUEUE (lazy-build from ->delay)
-  ], $class
-}
+    unless defined $self->seconds and defined $self->events;
+  $self
+};
 
 sub clone {
   my ($self, %params) = @_;
-
   $params{events} = $self->events
     unless defined $params{events};
-
   $params{seconds} = $self->seconds
     unless defined $params{seconds};
 
-  my $cloned = blessed($self)->new(%params);
-
+  my $cloned = $self->new(%params);
   if (my $currentq = $self->_queue) {
     $cloned->[QUEUE] = array( $currentq->all )
   }
-
   $cloned
 }
 
@@ -86,10 +71,7 @@ sub delay {
 }
 
 
-sub clear {
-  $_[0]->[QUEUE] = undef;
-  1
-}
+sub clear { $_[0]->[QUEUE] = undef; 1 }
 
 sub expire {
   my ($self) = @_;
@@ -107,6 +89,8 @@ sub is_expired {
 1;
 
 =pod
+
+=for Pod::Coverage EVENTS QUEUE SECS
 
 =head1 NAME
 
@@ -167,6 +151,10 @@ L<http://www.metacpan.org/author/CADE>):
     - time()
 
 This module uses L<Time::HiRes> to provide support for fractional seconds.
+
+See L<Algorithm::FloodControl> for a similar module with a functional
+interface & persistent on-disk storage features (for use with CGI
+applications).
 
 =head2 new
 

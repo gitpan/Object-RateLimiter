@@ -58,6 +58,10 @@ discussion by Vladi Belperchinov-Shabanski (CPAN:
 
 This module uses [Time::HiRes](http://search.cpan.org/perldoc?Time::HiRes) to provide support for fractional seconds.
 
+See [Algorithm::FloodControl](http://search.cpan.org/perldoc?Algorithm::FloodControl) for a similar module with a functional
+interface & persistent on-disk storage features (for use with CGI
+applications).
+
 ## new
 
     my $ctrl = Object::RateLimiter->new(
