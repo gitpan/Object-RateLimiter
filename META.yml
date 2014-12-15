@@ -3,25 +3,23 @@ abstract: 'A flood control (rate limiter) object'
 author:
   - 'Jon Portnoy <avenj@cobaltirc.org>'
 build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
   Test::More: 0.88
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Object-RateLimiter
 requires:
-  Carp: 0
   Class::Method::Modifiers: 0
   List::Objects::WithUtils: 2
-  Object::ArrayType::New: 0.002001
-  Scalar::Util: 0
-  Time::HiRes: 0
+  Object::ArrayType::New: 0.002
   namespace::clean: 0
-  overload: 0
 resources:
   repository: git://github.com/avenj/object-ratelimiter.git
-version: 1.001002
+version: 1.001003

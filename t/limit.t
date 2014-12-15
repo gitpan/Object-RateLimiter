@@ -1,7 +1,7 @@
 use Test::More;
 use strict; use warnings FATAL => 'all';
 
-BEGIN { use_ok( 'Object::RateLimiter' ) }
+use Object::RateLimiter;
 
 # new()
 eval {; Object::RateLimiter->new };
@@ -11,10 +11,10 @@ cmp_ok $@, '=~', qr/parameters/, 'new() without seconds param dies ok';
 eval {; Object::RateLimiter->new(seconds => 3) };
 cmp_ok $@, '=~', qr/parameters/, 'new() without events param dies ok';
 
-my $ctrl = new_ok 'Object::RateLimiter' => [
+my $ctrl = Object::RateLimiter->new(
   events  => 3,
   seconds => 1200,
-];
+);
 
 isa_ok $ctrl->new(events => 1, seconds => 2), 'Object::RateLimiter';
 

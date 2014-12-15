@@ -23,11 +23,9 @@ Object::RateLimiter - A flood control (rate limiter) object
       if (my $delay = $ctrl->delay) {
         # Delayed $delay (fractional) seconds.
         # (You might want Time::HiRes::sleep, or yield to event loop, etc)
-        sleep $delay;
-      } else {
-        # No delay.
-        print $some_item->()
+        sleep $delay
       }
+      print $some_item->()
     }
 
     # Clear the event history if it's stale:
@@ -56,9 +54,9 @@ discussion by Vladi Belperchinov-Shabanski (CPAN:
       )
       - time()
 
-This module uses [Time::HiRes](http://search.cpan.org/perldoc?Time::HiRes) to provide support for fractional seconds.
+This module uses [Time::HiRes](https://metacpan.org/pod/Time::HiRes) to provide support for fractional seconds.
 
-See [Algorithm::FloodControl](http://search.cpan.org/perldoc?Algorithm::FloodControl) for a similar module with a functional
+See [Algorithm::FloodControl](https://metacpan.org/pod/Algorithm::FloodControl) for a similar module with a functional
 interface & persistent on-disk storage features (for use with CGI
 applications).
 
@@ -75,7 +73,7 @@ Constructs a new rate-limiter with a clean event history.
 
     $ctrl->clear;
 
-Clears the event history. Always returns true.
+Clear the event history.
 
 ## clone
 
@@ -109,18 +107,18 @@ A return value of 0 indicates that the event does not need to wait.
 
 ## events
 
-Returns the __events__ limit the object was constructed with.
+Returns the **events** limit the object was constructed with.
 
 ## expire
 
     $ctrl->expire;
 
-Clears the event history if ["is\_expired"](#is\_expired) is true.
+Clears the event history if ["is\_expired"](#is_expired) is true.
 
 Returns true if ["clear"](#clear) was called.
 
-You're not required to call `expire()`, but it can be useful to save a little
-memory (a 10 event history uses about 1kb here).
+(You're not required to call `expire()`, but it can be useful to save a
+little memory.)
 
 ## is\_expired
 
@@ -131,13 +129,13 @@ Also see ["expire"](#expire)
 
 ## seconds
 
-Returns the __seconds__ limit the object was constructed with.
+Returns the **seconds** limit the object was constructed with.
 
 # AUTHOR
 
 Jon Portnoy <avenj@cobaltirc.org>
 
-Based on the math from [Algorithm::FloodControl](http://search.cpan.org/perldoc?Algorithm::FloodControl) as described in an article
+Based on the math from [Algorithm::FloodControl](https://metacpan.org/pod/Algorithm::FloodControl) as described in an article
 written by the author:
 [http://www.perl.com/pub/2004/11/11/floodcontrol.html](http://www.perl.com/pub/2004/11/11/floodcontrol.html)
 

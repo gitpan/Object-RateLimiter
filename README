@@ -21,11 +21,9 @@ SYNOPSIS
         if (my $delay = $ctrl->delay) {
           # Delayed $delay (fractional) seconds.
           # (You might want Time::HiRes::sleep, or yield to event loop, etc)
-          sleep $delay;
-        } else {
-          # No delay.
-          print $some_item->()
+          sleep $delay
         }
+        print $some_item->()
       }
 
       # Clear the event history if it's stale:
@@ -70,7 +68,7 @@ DESCRIPTION
   clear
       $ctrl->clear;
 
-    Clears the event history. Always returns true.
+    Clear the event history.
 
   clone
       my $new_ctrl = $ctrl->clone( events => 4 );
@@ -111,8 +109,8 @@ DESCRIPTION
 
     Returns true if "clear" was called.
 
-    You're not required to call "expire()", but it can be useful to save a
-    little memory (a 10 event history uses about 1kb here).
+    (You're not required to call "expire()", but it can be useful to save a
+    little memory.)
 
   is_expired
     Returns true if the last seen event is outside of our time window (in

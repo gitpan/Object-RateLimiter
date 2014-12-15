@@ -1,5 +1,13 @@
 Revision history for Perl module Object::RateLimiter
 
+1.001003 2014-12-15
+
+  - POD clarifications
+
+  - Minor optimizations & syntactical cleanups
+
+  - Packaging; switch to dependency tracking via 'cpanfile'
+
 1.001002 2013-12-15
 
   - Use Object::ArrayType::New
